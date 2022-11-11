@@ -2,11 +2,11 @@ import string
 from random import randint, choice
 
 
-letra = choice(string.ascii_letters)
+#letra = choice(string.ascii_letters)
 
-print(letra)
+#print(letra)
 
-#archivo = open('datos.txt')
+archivo = open('datos.txt')
 
 
 #for i in range(51):
@@ -15,5 +15,3 @@ print(letra)
 #print(len(archivo.readline()))
 
 
-d1 = {'valor':(1,2,5,7)}
-print(d1['valor'][2])

@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('',views.index,name='index'),
     path('bd/', views.post_list, name='post_list'),
-    path('knn/',views.algoritmo_kdd,name='algoritmo_knn'),
+    path('knn/',views.algoritmo_knn,name='algoritmo_knn'),
     path('cbi/',views.C_Bay_ing,name='C_Bay_ing'),
     
 ]

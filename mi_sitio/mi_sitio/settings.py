@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'knn.apps.KnnConfig',
 ]
 
 MIDDLEWARE = [

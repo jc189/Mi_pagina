@@ -24,27 +24,26 @@ def post_list(request):
 def mostrar_datos(request):
     consulta = PostTwo.objects.all
 
-def algoritmo_kdd(request):
+def algoritmo_knn(request):
 
     consulta = PostTwo.objects.all()
     lista = []
     l = []
     d = []
     n = []
+    lista_knn = {}
 
     if request.method == 'POST':
         entrada = request.POST
         lista = calcularDistancia(entrada,consulta)
         lista.sort(key=lambda x:x[1])
         for i in lista:
-            l.append(i[0])
-            d.append(i[1])
             n.append([i[0],i[1]])
         lista_knn = vecinosCercanos(int(entrada['k1']),lista)
         
         
                 
-    return render(request, 'blog/algoritmo_knn.html',{'dist':lista,'d':d,'l':l,'tabla':n,'vc':lista_knn})
+    return render(request, 'blog/algoritmo_knn.html',{'dist':lista,'vc':lista_knn})
 
 def index(request):
     return render(request, 'blog/index.html',{})

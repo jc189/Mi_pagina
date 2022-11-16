@@ -37,13 +37,16 @@
     <table class="table table-bordered table-dark">
         <thead class="thead-light">
               <tr>
-                <th scope="col">Letra/Distancias</th>
+                <th scope="col">Letra</th>
+                <th scope="col">Distancias</th>
               </tr>
         </thead>
         <tbody>
               {%for dato in dist%}
               <tr>
-                <td>{{dato}}</td>
+                {%for d in dato%}
+                <td>{{d}}</td>
+                {% endfor %}
               </tr>
               {% endfor %}
         </tbody>

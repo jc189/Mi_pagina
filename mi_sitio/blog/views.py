@@ -2,14 +2,17 @@ from django.shortcuts import render
 from .models import PostTwo
 from math import sqrt, pow, e, pi
 from statistics import mean, pvariance
+from django.http import HttpResponse
 
 # Create your views here.
+
+def index(request):
+    return render(request, 'blog/index.html',{})
 
 def post_list(request):
     consulta = PostTwo.objects.all()
     #se supone que consulta tiene los valores de la base de datos
     tupla = ()
-    print(consulta)
     
     #con este for lo fui recorriendo los datos para poder sacarlos y sumarlos
     for i in consulta:
@@ -39,25 +42,20 @@ def algoritmo_knn(request):
         for i in lista:
             n.append([i[0],i[1]])
         lista_knn = vecinosCercanos(int(entrada['k1']),lista)
-        
-                
+
+        pagina = "<html><body><h1>Tu letra es:" + str(n[0][0]) +"</h1></body></html>"
+        return HttpResponse(pagina)
+                        
     return render(request, 'blog/algoritmo_knn.html',{'dist':lista,'vc':lista_knn})
 
-def index(request):
-    return render(request, 'blog/index.html',{})
 
 def C_Bay_ing(request):
 
     consulta = PostTwo.objects.all()
     valores = obtenerValores(consulta)
-    medias = calcularMedia(valores)
-    varianzas = calcularVarianza(valores)
+    dc = calc_MedyVar(valores)
 
-    datos = []
-
-    for i in medias:
-        t = (i,medias[i][0],varianzas[i][0],medias[i][1],varianzas[i][1],medias[i][2],varianzas[i][2])
-        datos.append(t)
+    resultados = []
 
     if request.method == 'POST':
         entrada = request.POST
@@ -65,23 +63,32 @@ def C_Bay_ing(request):
         x1 = int(entrada['x1'])
         x2 = int(entrada['x2'])
         x3 = int(entrada['x3'])
+        porc = 0
 
-        resultados = []
-
-        for i in datos:
-            X11 = calcularProbabilidad(x1,i[1],i[2])
+        for i in dc:
+            x11 = calcularProbabilidad(x1,i[1],i[2])
             x22 = calcularProbabilidad(x2,i[3],i[4])
             x33 = calcularProbabilidad(x3,i[5],i[6])
-
-            resultados.append((i[0],((1/len(datos))*X11*x22*x33)))
+            pro = len(valores[i[0]][0])/len(consulta)
+            resultados.append((i[0],pro*x11*x22*x33))
         
         resultados.sort(key=lambda x:x[1])
-        r = resultados[-1]
 
+        pagina = "<html><body><h1>Tu letra es:" + str(resultados[-1][0]) +"</h1></body></html>"
+        return HttpResponse(pagina)
 
-    return render(request,'blog/C_Bay_ing.html',{'data':datos,'Resultado':r[0]})
+    
+    return render(request,'blog/C_Bay_ing.html',{'data':dc,'resul':resultados})
 
+def regresion_lineal(request):
 
+    x1 = [1,2,2,3,4,4,5,6]
+    y2 = [2,3,4,4,4,6,5,7]
+
+    val = calc_Reg_Lin(x1,y2)
+    print(val)
+
+    return render(request,'blog/regresion_lineal.html',{})
 
 def calcularDistancia(entrada,consulta):
     lista = []
@@ -110,21 +117,6 @@ def vecinosCercanos(k,lista):
 
     return lista_knn
 
-def calcularMedia(datos):
-
-    media = {}
-
-    for i in list(datos.keys()):
-        media[i] = [round(mean(datos[i][0]),2),round(mean(datos[i][1]),2),round(mean(datos[i][2]),2)]
-    return media
-
-def calcularVarianza(datos):
-    varianza = {}
-
-    for i in list(datos.keys()):
-        varianza[i] = [round(pvariance(datos[i][0]),2),round(pvariance(datos[i][1]),2),round(pvariance(datos[i][2]),2)]
-
-    return varianza
 
 def obtenerValores(consulta):
     valores = {}
@@ -137,6 +129,21 @@ def obtenerValores(consulta):
             valores[i.col2][2].append(i.col4)
     return valores
 
+def calc_MedyVar(datos):
+
+    dc = []
+
+    for i in datos.keys():
+        mX1 = round(mean(datos[i][0]),2)
+        vX1 = round(pvariance(datos[i][0]),2)
+        mX2 = round(mean(datos[i][1]),2)
+        vX2 = round(pvariance(datos[i][1]),2)
+        mX3 = round(mean(datos[i][2]),2)
+        vX3 = round(pvariance(datos[i][2]),2)
+        dc.append([i,mX1,vX1,mX2,vX2,mX2,vX2])
+
+    return dc
+
 def calcularProbabilidad(muestra,media,varianza):
     if varianza == 0:
         return 0
@@ -144,3 +151,22 @@ def calcularProbabilidad(muestra,media,varianza):
         p = 1/sqrt(2*pi*varianza)
     exp = e*-(pow(muestra-media,2)/(2*varianza))
     return -(p*exp)
+
+def calc_Reg_Lin(xi,yi):
+    
+    #Calculando sumatorias de los valores
+    sx = sum(xi)
+    sy = sum(yi)
+    sx2 = 0
+    for i in xi:
+        sx2 += i**2
+    sxy = 0
+    for i in range(len(xi)):
+        sxy += xi[i]*yi[i]
+    
+    #APlicando formulas para b1 y b0
+
+    b1 = (sxy-(len(xi)*mean(xi)*mean(yi)))/(sx2-((1/len(yi))*(sx)**2))
+    b0 = mean(yi) - (b1*mean(xi))
+
+    return b0,b1

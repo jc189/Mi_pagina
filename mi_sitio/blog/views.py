@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .models import PostTwo
 from math import sqrt, pow, e, pi
 from statistics import mean, pvariance
+import random
+import numpy as np
 from django.http import HttpResponse
 
 # Create your views here.
@@ -46,7 +48,7 @@ def algoritmo_knn(request):
         pagina = "<html><body><h1>Tu letra es:" + str(n[0][0]) +"</h1></body></html>"
         return HttpResponse(pagina)
                         
-    return render(request, 'blog/algoritmo_knn.html',{'dist':lista,'vc':lista_knn})
+    return render(request, 'blog/algoritmo_knn.html',{})
 
 
 def C_Bay_ing(request):
@@ -78,15 +80,27 @@ def C_Bay_ing(request):
         return HttpResponse(pagina)
 
     
-    return render(request,'blog/C_Bay_ing.html',{'data':dc,'resul':resultados})
+    return render(request,'blog/C_Bay_ing.html',{})
 
 def regresion_lineal(request):
 
-    x1 = [1,2,2,3,4,4,5,6]
-    y2 = [2,3,4,4,4,6,5,7]
+    consulta = PostTwo.objects.all()
+    valores = obtenerValores(consulta)
 
-    val = calc_Reg_Lin(x1,y2)
-    print(val)
+    xi = valores['H'][1]
+    yi = valores['H'][2]
+
+    b0,b1 = calc_Reg_Lin(xi,yi)
+    
+    if request.method == 'POST':
+        entrada = request.POST
+        x1 = int(entrada['x1'])
+        x2 = int(entrada['x2'])
+        datos = PostTwo.objects.all()
+        b = calcConstante(datos)
+        resultado  = valorReferente(datos, x1, x2, b)
+        pagina = "<html><body><h1>Tu letra es:" + str(resultado) +"</h1></body></html>"
+        return HttpResponse(pagina)
 
     return render(request,'blog/regresion_lineal.html',{})
 
@@ -170,3 +184,38 @@ def calc_Reg_Lin(xi,yi):
     b0 = mean(yi) - (b1*mean(xi))
 
     return b0,b1
+
+
+def valorReferente(datos, x1, x2, b):
+    a1 = 0
+    a2 = 0
+    caracter = ''
+    resp=[]
+    for i in list(datos):
+        a1 = i.col3
+        caracter = i.col2
+        a2 = i.col4
+        
+        salida = 1/(1 + np.exp(-(a1*x1 + a2*x2 + b)))
+        if salida > 0.5:
+            #respuesta = caracter
+            resp.append(caracter)
+        else:
+            respuesta = f'No hay resultado que haya podido encontrar: {caracter}'
+    respuesta = random.choice(resp)
+    return respuesta
+
+def calcConstante(datos):
+    x = []
+    y = []
+    xCuadrada = 0
+    xy = 0
+    for i in list(datos):
+        xCuadrada = xCuadrada + i.col3**2
+        xy = xy + i.col3 * i.col4
+        x.append(i.col3)
+        y.append(i.col4)
+    xSum = sum(x)
+    ySum = sum(y)
+    constante = (xCuadrada*ySum - xy*xSum)/(datos.count()*xCuadrada-xSum**2)
+    return constante 

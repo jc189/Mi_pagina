@@ -63,30 +63,6 @@
             <button type="submit" class="btn btn-primary btn-sm">Iniciar</button>
         </form>
 
-        <table class="table table-bordered table-dark">
-            <thead class="thead-light">
-                <tr>
-                    <th scope="col">Letra</th>
-                    <th scope="col">Media X1</th>
-                    <th scope="col">Varianza X1</th>
-                    <th scope="col">Media X2</th>
-                    <th scope="col">Varianza X2</th>
-                    <th scope="col">Media X3</th>
-                    <th scope="col">Varianza X3</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%for dato in data%}
-                <tr>
-                    {%for d in dato%}
-                    <td>{{d}}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h3>{{resul}}</h3>
         
     </body>
 

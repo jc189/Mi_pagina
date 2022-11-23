@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from .models import PostTwo
-from math import sqrt, pow, e, pi
+from math import sqrt, pow, e, pi,exp
 from statistics import mean, pvariance
 import random
-import numpy as np
 from django.http import HttpResponse
 
 # Create your views here.
@@ -196,7 +195,7 @@ def valorReferente(datos, x1, x2, b):
         caracter = i.col2
         a2 = i.col4
         
-        salida = 1/(1 + np.exp(-(a1*x1 + a2*x2 + b)))
+        salida = 1/(1 + exp(-(a1*x1 + a2*x2 + b)))
         if salida > 0.5:
             #respuesta = caracter
             resp.append(caracter)
